@@ -179,7 +179,7 @@ Extremely helpful for debugging print-snippet (php):
     <content><![CDATA[
   var_dump($last_assigned_variable);
   ]]></content>
-    <tabTrigger>v</tabTrigger> <!-- note that "C" is in capital case -->
+    <tabTrigger>v</tabTrigger>
     <scope>source.php(?!.*source)</scope>
     <description>var_dump</description>
   </snippet>
