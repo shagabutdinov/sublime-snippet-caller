@@ -226,3 +226,15 @@ intellectual. I'll try to help you to do it by providing useful stuff like
 |-----------------------------------|-------------------|
 | Insert snippet or goto next field | tab               |
 | Show snippet caller panel         | ctrl+\            |
+
+
+### Dependencies
+
+- https://github.com/shagabutdinov/sublime-context
+- https://github.com/shagabutdinov/sublime-quick-search-enhanced
+
+For "last assigned variable" snippet variable:
+
+- https://github.com/shagabutdinov/sublime-local-variable
+- https://github.com/shagabutdinov/sublime-expression
+- https://github.com/shagabutdinov/sublime-statement
