@@ -1,0 +1,145 @@
+[
+  {
+    "keys": ["ctrl+\\"],
+    "command": "show_snippet_selecter"
+  },
+
+  {
+    "keys": ["tab"],
+    "command": "insert_exact_snippet_from_selecter",
+    "context": [
+      {"key": "search_panel_name", "operator": "regex_contains", "operand": "snippet_selecter"}
+    ]
+  },
+
+  {
+    "keys": ["tab"],
+    "command": "insert",
+    "args": {
+      "characters": "\t"
+    },
+    "context": [
+      {"key": "overlay_visible", "operator": "equal", "operand": false},
+      {"key": "matched_snippets_count", "operator": "equal", "operand": "0"},
+      {"key": "has_next_field", "operator": "equal", "operand": false}
+    ]
+  },
+
+  {
+    "keys": ["tab"],
+    "command": "insert_best_completion",
+    "args": {
+      "exact": false,
+      "default": "\t"
+    },
+    "context": [
+      {"key": "overlay_visible", "operator": "equal", "operand": false},
+      {"key": "scope_b", "operator": "regex_contains", "operand": "(source.css)(?!.*source)"}
+    ]
+  },
+
+  {
+    "keys": ["tab"],
+    "command": "replace_completion_with_next_completion",
+    "context": [
+      {"key": "overlay_visible", "operator": "equal", "operand": false},
+      {"key": "last_command", "operator": "equal", "operand": "insert_best_completion"},
+    ]
+  },
+
+  {
+    "keys": ["tab"],
+    "command": "insert_best_completion_or_goto_next_field",
+    "args": {
+      "exact": false,
+      "default": "\t",
+      "fallback": true,
+      "completion_command": "insert_best_completion_enhanced"
+    },
+    "context": [
+      {"key": "overlay_visible", "operator": "equal", "operand": false},
+      {"key": "scope_b", "operator": "regex_contains", "operand": "(text.html)(?!.*source)"}
+    ]
+  },
+
+  {
+    "keys": ["tab"],
+    "command": "insert_best_completion_enhanced",
+    "context": [
+      {"key": "overlay_visible", "operator": "equal", "operand": false},
+      {"key": "matched_snippets_count", "operator": "regex_contains", "operand": "[1-9]"},
+      {"key": "last_command", "operator": "not_equal", "operand": "next_field"},
+      {"key": "last_command", "operator": "not_equal", "operand": "insert_best_completion_enhanced"},
+      {"key": "scope_b", "operator": "not_regex_contains", "operand": "(text\\.html|text\\.css)(?!.*source)"},
+    ]
+  },
+
+  {
+    "keys": ["shift+tab"],
+    "command": "next_field"
+  },
+
+  {
+    "keys": ["tab"],
+    "command": "next_field",
+    "context": [
+      {"key": "overlay_visible", "operator": "equal", "operand": false},
+      {"key": "matched_snippets_count", "operator": "equal", "operand": "0"},
+      {"key": "has_next_field", "operator": "equal", "operand": true},
+      {"key": "scope_b", "operator": "not_regex_contains", "operand": "(text\\.html)(?!.*source)"},
+    ]
+  },
+
+  {
+    "keys": ["tab"],
+    "command": "next_field",
+    "context": [
+      {"key": "overlay_visible", "operator": "equal", "operand": false},
+      {"key": "last_command", "operator": "equal", "operand": "next_field"},
+      {"key": "has_next_field", "operator": "equal", "operand": true},
+      {"key": "scope_b", "operator": "not_regex_contains", "operand": "(text\\.html)(?!.*source)"},
+    ]
+  },
+
+  {
+    "keys": ["tab"],
+    "command": "next_field",
+    "context": [
+      {"key": "overlay_visible", "operator": "equal", "operand": false},
+      {"key": "last_command", "operator": "equal", "operand": "insert_best_completion_enhanced"},
+      {"key": "has_next_field", "operator": "equal", "operand": true},
+      {"key": "scope_b", "operator": "not_regex_contains", "operand": "(text\\.html)(?!.*source)"},
+    ]
+  },
+
+  {
+    "keys": ["tab"],
+    "command": "reindent",
+    "context": [
+      {"key": "overlay_visible", "operator": "equal", "operand": false},
+      {"key": "setting.auto_indent", "operator": "equal", "operand": true},
+      {"key": "selection_empty", "operator": "equal", "operand": true, "match_all": true},
+      {"key": "preceding_text", "operator": "regex_match", "operand": "^$", "match_all": true},
+      {"key": "following_text", "operator": "regex_match", "operand": "^$", "match_all": true}
+    ]
+  },
+
+  {
+    "keys": ["tab"],
+    "command": "indent",
+    "context": [
+      {"key": "overlay_visible", "operator": "equal", "operand": false},
+      {"key": "text", "operator": "regex_contains", "operand": "\n"}
+    ]
+  },
+
+  {
+    "keys": ["tab"],
+    "command": "commit_completion",
+    "context": [
+      {"key": "overlay_visible", "operator": "equal", "operand": false},
+      {"key": "auto_complete_visible"},
+      {"key": "setting.auto_complete_commit_on_tab"}
+    ]
+  },
+]

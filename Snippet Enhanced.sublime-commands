@@ -1,0 +1,6 @@
+[
+    {
+        "caption": "Snippet Enhanced: Reload snippets",
+        "command": "reload_snippets"
+    }
+]
