@@ -1,10 +1,18 @@
 import sublime
 import sublime_plugin
-from LocalVariable import local_variable
+
 import re
-from Method import method as method_parser
-from Expression import expression
-from Statement import statement
+
+try:
+  from LocalVariable import local_variable
+  from Method import method as method_parser
+  from Expression import expression
+  from Statement import statement
+except ImportError:
+  sublime.error_message("Dependency import failed; please read readme for " +
+   "SnippetCaller plugin for installation instructions; to disable this " +
+   "message remove this plugin")
+
 
 def get(view, sel, values):
   scope = None
@@ -15,7 +23,7 @@ def get(view, sel, values):
   else:
     scope = [0, view.size()]
 
-  match = expression.find_match(view, sel.b, r'[^=][\*\/+\-]?=(?!=)\s*', 
+  match = expression.find_match(view, sel.b, r'[^=][\*\/+\-]?=(?!=)\s*',
     {'backward': True, 'range': [scope[0], sel.b]})
 
   if match == None:
@@ -25,7 +33,7 @@ def get(view, sel, values):
   if container == None:
     return None
 
-  variables = local_variable.find_variables(view, container[0], False, 
+  variables = local_variable.find_variables(view, container[0], False,
     container)
 
   if variables == None or len(variables) == 0:

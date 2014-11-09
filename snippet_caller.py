@@ -1,9 +1,16 @@
 import sublime
 import sublime_plugin
-from xml.dom import minidom
+
 import re
 import os
-from Context import context
+from xml.dom import minidom
+
+try:
+  from Context import context
+except ImportError:
+  sublime.error_message("Dependency import failed; please read readme for " +
+   "Context plugin for installation instructions; to disable this " +
+   "message remove this plugin")
 
 class Snippet():
   def __init__(self):

@@ -9,7 +9,7 @@ yet.
 
 ### Demo
 
-![Demo](https://raw.github.com/shagabutdinov/sublime-snippet-caller/master/demo/demo.gif "Demo")
+![Demo](https://github.com/shagabutdinov/sublime-enhanced-demos/raw/master/snippet_caller.gif "Demo")
 
 
 ### Installation
@@ -97,7 +97,7 @@ snippet execution; note that if you want to avoid scope collision you should
 specify negative lookahead for next scope (e.g. "text.html(?!.*source)" for
 html that will works only in html but not in embedded languages); note that
 for html and css snippet-enhanced will fallback to default sublime snippets
-("insert_best_completion") if no snippet will be found it is better to keep
+("insert_best_completion") if no snippet will be found. It is better to keep
 html-snippets with ".sublime-snippet-enhanced" extension in order to avoid
 hitting it with sublime default snippet system
 
@@ -235,6 +235,6 @@ intellectual. I'll try to help you to do it by providing useful stuff like
 
 For "last assigned variable" snippet variable:
 
-- https://github.com/shagabutdinov/sublime-local-variable
-- https://github.com/shagabutdinov/sublime-expression
-- https://github.com/shagabutdinov/sublime-statement
+* [LocalVariable](https://github.com/shagabutdinov/sublime-local-variable)
+* [Expression](https://github.com/shagabutdinov/sublime-expression)
+* [Statement](https://github.com/shagabutdinov/sublime-statement)
