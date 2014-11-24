@@ -45,7 +45,7 @@ class InsertBestCompletionEnhanced(sublime_plugin.TextCommand):
         descriptions.append([
           current_snippet.get('tabTrigger', '') + ' ' +
             current_snippet.get('description', '') + ' ' +
-            str(current_snippet.get('_scope', None)),
+            '<' + str(current_snippet.get('_scope', None)) + '>',
             current_snippet['path']
         ])
 
