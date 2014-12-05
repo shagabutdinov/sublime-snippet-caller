@@ -70,7 +70,6 @@ class SnippetInfo():
       return values
 
     parameters = {'view': view, 'sel': sel, 'values': values}
-    print(eval_code)
     eval_result = eval(eval_code.strip(), parameters)
 
     if not isinstance(eval_result, dict):
