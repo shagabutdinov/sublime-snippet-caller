@@ -9,7 +9,7 @@ try:
   from Context import context
 except ImportError:
   sublime.error_message("Dependency import failed; please read readme for " +
-   "Context plugin for installation instructions; to disable this " +
+   "SnippetCaller plugin for installation instructions; to disable this " +
    "message remove this plugin")
 
 class Snippet():
