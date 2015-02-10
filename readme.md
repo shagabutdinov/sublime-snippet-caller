@@ -31,6 +31,9 @@ sublime's snippet system does not provide way to specify different snippet
 values for different cursors and workaround requires complete rewriting of
 sublime's internal snippet system.
 
+This plugin does not work with completions popup (ctrl+space), because sublime
+does not provide API to catch snippet expansion from completions popup and
+there is no way to see which completion currently selected in list.
 
 ### Features
 
