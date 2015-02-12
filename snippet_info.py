@@ -87,8 +87,8 @@ class SnippetInfo():
       value = values[key]
 
       preceding = content[:match.start(2) - 1]
-      spacing = re.finditer(r'(^|\n)( *)', preceding)
-      indentation = list(reversed(list(spacing)))[0].group(2)
+      spacing = re.finditer(r'(^|\n)(\s*)', preceding)
+      indentation = list(reversed(list(spacing)))[0].group(2).replace("\n", "")
 
       value = re.sub(r'\n', '\n' + indentation, value)
       content = preceding + value + content[match.end(2):]
