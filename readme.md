@@ -35,6 +35,9 @@ This plugin does not work with completions popup (ctrl+space), because sublime
 does not provide API to catch snippet expansion from completions popup and
 there is no way to see which completion currently selected in list.
 
+This plugin does not support variable regexps (e.g. `${foo/a/b/ig}`). Only plain
+variables supported (e.g. $foo or $bar).
+
 ### Features
 
 - Better scope detection; e.g. you can write snippets for string that sits under
