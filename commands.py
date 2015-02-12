@@ -81,14 +81,6 @@ class InsertBestCompletionEnhanced(sublime_plugin.TextCommand):
       region = sublime.Region(start, sel.a)
       self.view.replace(edit, region, '')
 
-    eval_code = None
-    if 'eval' in snippet:
-      eval_code = snippet['eval']
-
-    commands = ['RUN']
-    if 'commands' in snippet:
-      commands = snippet['commands']
-
     self.view.run_command('insert_snippet_enhanced', {'snippet': snippet})
 
 class ReloadSnippets(sublime_plugin.WindowCommand):

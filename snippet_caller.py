@@ -87,7 +87,13 @@ class Snippet():
     if 'commands' in snippet:
       snippet['commands'] = sublime.decode_value(snippet['commands'])
 
-    snippet['content'] = snippet['content'].strip()
+
+    if snippet['content'][0] == "\n":
+      snippet['content'] = snippet['content'][1:]
+
+    if snippet['content'][len(snippet['content']) - 1] == "\n":
+      snippet['content'] = snippet['content'][:len(snippet['content']) - 1]
+
     if len(snippet['content']) == 0:
       return None
 
