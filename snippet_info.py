@@ -79,10 +79,10 @@ class SnippetInfo():
 
   def _get_content_with_values(self, values):
     content = values['contents']
-    for match in reversed(list(re.finditer(r'(\\*)\$(\{?(\w+)\}?)', content))):
+    for match in reversed(list(re.finditer(r'(\\*)\$(\{[a-zA-Z]\w+\}|\w+)', content))):
       key = match.group(2)
-      if key != match.group(3):
-        key = match.group(3)
+      if key[0] == '{':
+        key = key[1:len(key)-1]
 
       if len(match.group(1)) % 2 != 0 or key not in values:
         continue
