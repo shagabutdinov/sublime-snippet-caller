@@ -16,7 +16,7 @@ except ImportError:
 
 class InsertSnippetEnhanced(sublime_plugin.TextCommand):
   def run(self, edit, snippet = None, contents = None, **args):
-    commands, contents = snippet_info.get(self.view, self.view.sel()[0],
+    commands, _ = snippet_info.get(self.view, self.view.sel()[0],
       snippet, contents, **args)
 
     for command in commands:
@@ -33,7 +33,6 @@ class InsertSnippetEnhanced(sublime_plugin.TextCommand):
 class InsertBestCompletionEnhanced(sublime_plugin.TextCommand):
   def run(self, edit, index = None, default = '', exact = False):
     self.found_snippets = snippet_caller.get_snippets(self.view)
-
     found_snippet = None
     if len(self.found_snippets) == 1:
       found_snippet = self.found_snippets[0]

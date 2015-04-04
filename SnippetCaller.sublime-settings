@@ -1,5 +1,6 @@
 {
   "variables": {
+    "selection": "SnippetCaller.selection.get",
     "indented_selection": "SnippetCaller.indented_selection.get",
     "last_assigned_variable": "SnippetCaller.last_assigned_variable.get",
   }

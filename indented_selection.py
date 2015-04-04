@@ -2,37 +2,19 @@ import sublime
 import sublime_plugin
 import re
 
-def get(view, sel, values):
-  if sel.empty():
-    return None
+from .selection import get as get_selection
 
-  region = sublime.Region(view.line(sel.begin()).a, sel.end())
-  wide_text = view.substr(region)
+def get(view, sel, _):
+  value = get_selection(view, sel, _)
+  if value == None:
+    return value
 
-  original_text = view.substr(sel)
-  ignore_first_line = False
-  if wide_text.strip() != original_text.strip():
-    text = re.search(r'^(\s*)', wide_text).group(1) + original_text
+  tab_size = view.settings().get('tab_size')
+  spaces = view.settings().get('translate_tabs_to_spaces')
+
+  if spaces:
+    tab = " " * tab_size
   else:
-    text = wide_text
+    tab = "\n"
 
-  match, min, source_indentation = None, None, ''
-  for index, line in enumerate(text.split("\n")):
-    if ignore_first_line and index == 0:
-      continue
-
-    match = re.search(r'^(\s*)\S', line)
-
-    if match == None:
-      continue
-
-    if min == None or min > len(match.group(1)):
-      min = len(match.group(1))
-      source_indentation = match.group(1)
-
-  if match == None:
-    return original_text
-
-  text = re.sub(r'(^|\n)' + source_indentation, '\\1', text)
-
-  return text
+  return re.sub(r'(^|\n)(.)', '\\1' + tab + '\\2', value)
