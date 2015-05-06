@@ -23,10 +23,19 @@ class SnippetInfo():
 
     return result
 
-  def get(self, view, sel, snippet = None, contents = None, **values):
+  def get(self, view, sel, snippet = None, contents = None, evaluate = True,
+    **values):
+
     eval_code, commands, values = self._get_info(snippet, values, contents)
     values.update(self._extract_content_values(view, sel, values))
-    values.update(self._eval(view, sel, eval_code, values))
+
+    if snippet != None and 'matches' in snippet:
+      for index, match in enumerate(snippet['matches']):
+        values['trigger' + str(index + 1)] = match
+
+    if evaluate:
+      values.update(self._eval(view, sel, eval_code, values))
+
     content = self._get_content_with_values(values)
     return commands, content
 
@@ -79,7 +88,9 @@ class SnippetInfo():
 
   def _get_content_with_values(self, values):
     content = values['contents']
-    for match in reversed(list(re.finditer(r'(\\*)\$(\{[a-zA-Z]\w+\}|\w+)', content))):
+
+    matches = re.finditer(r'(\\*)\$(\{[a-zA-Z]\w+\}|\w+)', content)
+    for match in reversed(list(matches)):
       key = match.group(2)
       if key[0] == '{':
         key = key[1:len(key)-1]
@@ -117,9 +128,9 @@ class SnippetInfo():
     return values
 
 __info = None
-def get(view, sel, snippet = None, contents = None, **values):
+def get(view, sel, snippet = None, contents = None, evaluate = True, **values):
   global __info
   if __info == None:
     __info = SnippetInfo()
 
-  return __info.get(view, sel, snippet, contents, **values)
+  return __info.get(view, sel, snippet, contents, evaluate, **values)

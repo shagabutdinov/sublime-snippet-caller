@@ -17,12 +17,12 @@ except ImportError:
 class InsertSnippetEnhanced(sublime_plugin.TextCommand):
   def run(self, edit, snippet = None, contents = None, **args):
     commands, _ = snippet_info.get(self.view, self.view.sel()[0],
-      snippet, contents, **args)
+      snippet, contents, False, **args)
 
     for command in commands:
       if command == 'RUN':
         _, contents = snippet_info.get(self.view, self.view.sel()[0],
-          snippet, contents, **args)
+          snippet, contents, True, **args)
         self.view.run_command('insert_snippet', {'contents': contents})
       else:
         if not context.check(self.view, command.get('context', [])):
@@ -31,8 +31,12 @@ class InsertSnippetEnhanced(sublime_plugin.TextCommand):
         self.view.run_command(command['command'], command.get('args', {}))
 
 class InsertBestCompletionEnhanced(sublime_plugin.TextCommand):
-  def run(self, edit, index = None, default = '', exact = False):
-    self.found_snippets = snippet_caller.get_snippets(self.view)
+  def run(self, edit, index = None, default = '', exact = False,
+    trigger_type = 'tabTrigger'):
+
+    self.found_snippets = snippet_caller.get_snippets(self.view,
+      trigger_type = trigger_type)
+
     found_snippet = None
     if len(self.found_snippets) == 1:
       found_snippet = self.found_snippets[0]
@@ -42,7 +46,7 @@ class InsertBestCompletionEnhanced(sublime_plugin.TextCommand):
       descriptions = []
       for current_snippet in self.found_snippets:
         descriptions.append([
-          current_snippet.get('tabTrigger', '') + ' ' +
+          current_snippet.get(trigger_type, '') + ' ' +
             current_snippet.get('description', '') + ' ' +
             '<' + str(current_snippet.get('_scope', None)) + '>',
             current_snippet['path']
@@ -53,7 +57,7 @@ class InsertBestCompletionEnhanced(sublime_plugin.TextCommand):
     if found_snippet == None:
       return
 
-    self._insert_snippet(edit, found_snippet)
+    self._insert_snippet(edit, found_snippet, trigger_type)
 
   def _done(self, index):
     if index == -1:
@@ -61,22 +65,22 @@ class InsertBestCompletionEnhanced(sublime_plugin.TextCommand):
 
     self.view.run_command('insert_best_completion_enhanced', {'index': index})
 
-  def _insert_snippet(self, edit, snippet):
+  def _insert_snippet(self, edit, snippet, trigger_type):
     for sel in self.view.sel():
       if sel.a != sel.b:
         return
 
-      start = sel.a - len(snippet['tabTrigger'])
+      start = sel.a - len(snippet[trigger_type])
       if start < 0:
         return
 
       region = sublime.Region(start, sel.a)
 
-      if self.view.substr(region) != snippet['tabTrigger']:
+      if self.view.substr(region) != snippet[trigger_type]:
         return
 
     for sel in self.view.sel():
-      start = sel.a - len(snippet['tabTrigger'])
+      start = sel.a - len(snippet[trigger_type])
       region = sublime.Region(start, sel.a)
       self.view.replace(edit, region, '')
 

@@ -18,7 +18,6 @@ class Snippet():
 
   def load_snippets(self):
     snippets = []
-    maximal_trigger_length = 0
     is_error_reported = False
     resources = (sublime.find_resources("*.sublime-snippet") +
       sublime.find_resources("*.sublime-snippet-enhanced"))
@@ -30,11 +29,6 @@ class Snippet():
             continue
 
           snippets.append(snippet)
-          maximal_trigger_length_exceeded = ('tabTrigger' in snippet and
-            len(snippet['tabTrigger']) > maximal_trigger_length)
-
-          if maximal_trigger_length_exceeded:
-            maximal_trigger_length = len(snippet['tabTrigger'])
 
       except Exception as error:
         if not is_error_reported:
@@ -43,7 +37,6 @@ class Snippet():
         is_error_reported = True
 
     self.snippets = snippets
-    self.maximal_trigger_length = maximal_trigger_length
 
   def _parse_snippets(self, name):
     xml_string = sublime.load_resource(name)
@@ -114,19 +107,40 @@ class Snippet():
 
     return snippet
 
-  def get_snippets(self, view, sel, trigger = None):
+  def get_snippets(self, view, sel, trigger = None,
+    trigger_type = 'tabTrigger'):
+
+    trigger_type_regexp = trigger_type + 'Regexp'
+
     found = []
     maximal_trigger_length = 0
     scope = view.scope_name(sel.b)
     for snippet in self.snippets:
-      if trigger != None and not 'tabTrigger' in snippet:
+      no_trigger = (
+        trigger != None and
+        not trigger_type in snippet and
+        not trigger_type_regexp in snippet
+      )
+
+      if no_trigger:
         continue
 
-      triggered = (trigger == None or ('tabTrigger' in snippet and
-        trigger == snippet['tabTrigger']))
+      triggered = (
+        trigger == None or
+        (
+          trigger_type in snippet and
+          trigger.endswith(snippet[trigger_type])
+        )
+      )
 
+      matches = None
       if not triggered:
-        continue
+        if trigger_type_regexp in snippet:
+          matches = re.search(snippet[trigger_type_regexp], trigger)
+          if matches == None:
+            continue
+        else:
+          continue
 
       if 'scope' in snippet and re.search(snippet['scope'], scope) == None:
         continue
@@ -134,33 +148,43 @@ class Snippet():
       if 'context' in snippet and not context.check(view, snippet['context']):
         continue
 
+      snippet = snippet.copy()
+
+      if matches != None:
+        snippet['matches'] = matches.groups()
+        snippet[trigger_type] = matches.group()
+
       found.append(snippet)
 
-      maximal_trigger_length_exceeded = ('tabTrigger' in snippet and
-        len(snippet['tabTrigger']) > maximal_trigger_length)
+      maximal_trigger_length_exceeded = (
+        trigger_type in snippet and
+        len(snippet[trigger_type]) > maximal_trigger_length
+      )
+
       if maximal_trigger_length_exceeded:
-        maximal_trigger_length = len(snippet['tabTrigger'])
+        maximal_trigger_length = len(snippet[trigger_type])
 
     filtered = []
+
     if trigger != None:
       for snippet in found:
-        has_maximal_length = ('tabTrigger' in snippet and
-          len(snippet['tabTrigger']) == maximal_trigger_length)
+        has_maximal_length = (
+          trigger_type in snippet and
+          len(snippet[trigger_type]) == maximal_trigger_length
+        )
+
         if has_maximal_length:
           filtered.append(snippet)
     else:
       filtered = found
 
     for index, snippet in enumerate(filtered):
-      snippet = snippet.copy()
       if 'scope' in snippet:
         snippet.pop('scope')
+
       filtered[index] = snippet
 
     return filtered
-
-  def get_maximal_trigger_length(self):
-    return self.maximal_trigger_length
 
 __snippet = None
 __cache = [None, None]
@@ -179,8 +203,9 @@ def get_snippet_helper():
 
   return __snippet
 
-def get_snippets(view, regexps = [r'(\S?(?:\w+)\S?|\S)$', r'((?:\w+)\S?|\S)$']):
-  maximal_trigger_length = get_snippet_helper().get_maximal_trigger_length()
+def get_snippets(view, regexps = [r'((\S?(?:\w+)\S?|\S)\s*)$',
+  r'(((?:\w+)\S?|\S)\s*)$'], trigger_type = 'tabTrigger'):
+
   sel = view.sel()[0]
   if sel.a != sel.b and regexps != None:
     return []
@@ -190,40 +215,35 @@ def get_snippets(view, regexps = [r'(\S?(?:\w+)\S?|\S)$', r'((?:\w+)\S?|\S)$']):
     str(view.id()),
     str(view.change_count()),
     str(sel.b),
-    str(regexps)
+    str(regexps),
+    str(trigger_type),
   ])
 
   global __cache
   if __cache != None and __cache[0] == __cache_key:
     return __cache[1]
 
-  start = sel.a - maximal_trigger_length
-  if start < 0:
-    start = 0
+  start = view.line(sel.a).a
+  # if start < 0:
+  #   start = 0
 
-  scope = view.scope_name(sel.a)
-
+  # scope = view.scope_name(sel.a)
   line = view.substr(sublime.Region(start, sel.a))
   helper = get_snippet_helper()
 
-  file_extension = None
-  file_name = view.file_name()
-  if file_name != None:
-    _, file_extension = os.path.splitext(file_name)
-
   result = []
   if regexps == None:
-    result = helper.get_snippets(view, sel)
+    result = helper.get_snippets(view, sel, None, trigger_type)
   else:
-    for regexp in regexps:
-      trigger = re.search(regexp, line)
-      trigger = trigger and trigger.group(1)
-      if trigger == None:
-        continue
+    # for regexp in regexps:
+    # trigger = re.search(regexp, line)
+    # trigger = trigger and trigger.group(1)
+    # if trigger == None:
+    #   continue
 
-      snippets = helper.get_snippets(view, sel, trigger)
-      if len(snippets) != 0:
-        result = snippets
+    snippets = helper.get_snippets(view, sel, line, trigger_type)
+    if len(snippets) != 0:
+      result = snippets
 
   __cache = [__cache_key, result]
   return result
