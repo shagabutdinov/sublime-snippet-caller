@@ -18,7 +18,6 @@ def get(view, sel, values):
   scope = None
   method = method_parser.extract_method(view, sel.b)
   if method != None:
-    _, method = method
     scope = [method['start'], method['end']]
   else:
     scope = [0, view.size()]

@@ -84,7 +84,11 @@ class SnippetInfo():
     if not isinstance(eval_result, dict):
       raise Exception("variables should be python code that returns dict")
 
-    return eval_result
+    result = {}
+    for key in eval_result:
+      result[key] = eval_result[key].replace('\\', '\\\\').replace('$', '\\$')
+
+    return result
 
   def _get_content_with_values(self, values):
     content = values['contents']

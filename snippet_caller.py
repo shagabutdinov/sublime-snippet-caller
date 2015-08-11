@@ -105,6 +105,9 @@ class Snippet():
     snippet['name'], _ = os.path.splitext(os.path.basename(name))
     snippet['path'] = name
 
+    if 'order' in snippet:
+      snippet['order'] = int(snippet['order'])
+
     return snippet
 
   def get_snippets(self, view, sel, trigger = None,
@@ -114,6 +117,7 @@ class Snippet():
 
     found = []
     maximal_trigger_length = 0
+    maximal_order = 0
     scope = view.scope_name(sel.b)
     for snippet in self.snippets:
       no_trigger = (
@@ -125,21 +129,30 @@ class Snippet():
       if no_trigger:
         continue
 
-      triggered = (
-        trigger == None or
-        (
-          trigger_type in snippet and
-          trigger.endswith(snippet[trigger_type])
-        )
-      )
+      snippet_trigger = snippet.get(trigger_type, None)
 
       matches = None
-      if not triggered:
-        if trigger_type_regexp in snippet:
-          matches = re.search(snippet[trigger_type_regexp], trigger)
-          if matches == None:
+      if trigger != None:
+        triggered = (
+          snippet_trigger != None and
+          trigger.endswith(snippet_trigger)
+        )
+
+        if not triggered:
+          if trigger_type_regexp in snippet:
+            matches = re.search(snippet[trigger_type_regexp] + '$', trigger)
+            if matches == None:
+              continue
+          else:
             continue
-        else:
+
+        word_not_triggered = (
+          snippet_trigger != None and
+          re.search(r'^\w', snippet_trigger) != None and
+          re.search(r'(\W|^)' + re.escape(snippet_trigger) + '$', trigger) == None
+        )
+
+        if word_not_triggered:
           continue
 
       if 'scope' in snippet and re.search(snippet['scope'], scope) == None:
@@ -152,28 +165,32 @@ class Snippet():
 
       if matches != None:
         snippet['matches'] = matches.groups()
-        snippet[trigger_type] = matches.group()
+        snippet_trigger = matches.group()
 
+      snippet['_trigger'] = snippet_trigger
       found.append(snippet)
 
       maximal_trigger_length_exceeded = (
-        trigger_type in snippet and
-        len(snippet[trigger_type]) > maximal_trigger_length
+        snippet_trigger != None and
+        len(snippet_trigger) > maximal_trigger_length
       )
 
       if maximal_trigger_length_exceeded:
-        maximal_trigger_length = len(snippet[trigger_type])
+        maximal_trigger_length = len(snippet_trigger)
+
+      order = snippet.get('order', 0)
+      if maximal_order < order:
+        maximal_order = order
 
     filtered = []
-
     if trigger != None:
       for snippet in found:
         has_maximal_length = (
-          trigger_type in snippet and
-          len(snippet[trigger_type]) == maximal_trigger_length
+          snippet_trigger != None and
+          len(snippet['_trigger']) == maximal_trigger_length
         )
 
-        if has_maximal_length:
+        if has_maximal_length and maximal_order == snippet.get('order', 0):
           filtered.append(snippet)
     else:
       filtered = found
@@ -203,19 +220,18 @@ def get_snippet_helper():
 
   return __snippet
 
-def get_snippets(view, regexps = [r'((\S?(?:\w+)\S?|\S)\s*)$',
-  r'(((?:\w+)\S?|\S)\s*)$'], trigger_type = 'tabTrigger'):
+def get_snippets(view, use_line = True, trigger_type = 'tabTrigger'):
 
   sel = view.sel()[0]
-  if sel.a != sel.b and regexps != None:
-    return []
+  # if sel.a != sel.b and use_line != None:
+  #   return []
 
   # __cache last get_snippets
   __cache_key = '-'.join([
     str(view.id()),
     str(view.change_count()),
     str(sel.b),
-    str(regexps),
+    str(use_line),
     str(trigger_type),
   ])
 
@@ -223,24 +239,14 @@ def get_snippets(view, regexps = [r'((\S?(?:\w+)\S?|\S)\s*)$',
   if __cache != None and __cache[0] == __cache_key:
     return __cache[1]
 
-  start = view.line(sel.a).a
-  # if start < 0:
-  #   start = 0
-
-  # scope = view.scope_name(sel.a)
-  line = view.substr(sublime.Region(start, sel.a))
   helper = get_snippet_helper()
 
   result = []
-  if regexps == None:
+  if use_line == False:
     result = helper.get_snippets(view, sel, None, trigger_type)
   else:
-    # for regexp in regexps:
-    # trigger = re.search(regexp, line)
-    # trigger = trigger and trigger.group(1)
-    # if trigger == None:
-    #   continue
-
+    start = view.line(sel.end()).a
+    line = view.substr(sublime.Region(start, sel.end()))
     snippets = helper.get_snippets(view, sel, line, trigger_type)
     if len(snippets) != 0:
       result = snippets

@@ -76,7 +76,7 @@
     "context": [
       {"key": "setting.sublime_enhanced_keybindings", "operator": "equal", "operand": true},
       {"key": "overlay_visible", "operator": "equal", "operand": false},
-      {"key": "selection_empty", "operator": "equal", "operand": true},
+      // {"key": "selection_empty", "operator": "equal", "operand": true},
       {"key": "preceding_text", "operator": "not_regex_contains", "operand": "^\\s*$"},
       {"key": "scope_b", "operator": "not_regex_contains", "operand": "(text\\.html|source\\.css)(?!.*source)"},
     ]
@@ -104,16 +104,25 @@
 
   {
     "keys": ["keypad_enter"],
-    "command": "none",
-  },
-
-  {
-    "keys": ["keypad_enter"],
     "command": "next_field",
     "context": [
       {"key": "setting.sublime_enhanced_keybindings", "operator": "equal", "operand": true},
+      {"key": "has_next_field", "operator": "equal", "operand": true},
     ]
   },
+
+  // {
+  //   "keys": ["keypad_enter"],
+  //   "command": "move",
+  //   "args": {
+  //     "by": "characters",
+  //     "forward": true,
+  //   },
+  //   "context": [
+  //     {"key": "setting.sublime_enhanced_keybindings", "operator": "equal", "operand": true},
+  //     {"key": "selection_empty", "operator": "equal", "operand": false},
+  //   ]
+  // },
 
   {
     "keys": ["tab"],
@@ -140,17 +149,6 @@
 
   {
     "keys": ["tab"],
-    "command": "commit_completion",
-    "context": [
-      {"key": "setting.sublime_enhanced_keybindings", "operator": "equal", "operand": true},
-      {"key": "overlay_visible", "operator": "equal", "operand": false},
-      {"key": "auto_complete_visible"},
-      {"key": "setting.auto_complete_commit_on_tab"}
-    ]
-  },
-
-  {
-    "keys": ["keypad_enter"],
     "command": "commit_completion",
     "context": [
       {"key": "setting.sublime_enhanced_keybindings", "operator": "equal", "operand": true},

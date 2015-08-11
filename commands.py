@@ -1,3 +1,4 @@
+
 import sublime
 import sublime_plugin
 import re
@@ -23,6 +24,7 @@ class InsertSnippetEnhanced(sublime_plugin.TextCommand):
       if command == 'RUN':
         _, contents = snippet_info.get(self.view, self.view.sel()[0],
           snippet, contents, True, **args)
+
         self.view.run_command('insert_snippet', {'contents': contents})
       else:
         if not context.check(self.view, command.get('context', [])):
@@ -67,21 +69,18 @@ class InsertBestCompletionEnhanced(sublime_plugin.TextCommand):
 
   def _insert_snippet(self, edit, snippet, trigger_type):
     for sel in self.view.sel():
-      if sel.a != sel.b:
-        return
-
-      start = sel.a - len(snippet[trigger_type])
+      start = sel.end() - len(snippet['_trigger'])
       if start < 0:
         return
 
-      region = sublime.Region(start, sel.a)
+      region = sublime.Region(start, sel.end())
 
-      if self.view.substr(region) != snippet[trigger_type]:
+      if self.view.substr(region) != snippet['_trigger']:
         return
 
     for sel in self.view.sel():
-      start = sel.a - len(snippet[trigger_type])
-      region = sublime.Region(start, sel.a)
+      start = sel.end() - len(snippet['_trigger'])
+      region = sublime.Region(start, sel.end())
       self.view.replace(edit, region, '')
 
     self.view.run_command('insert_snippet_enhanced', {'snippet': snippet})
@@ -110,7 +109,7 @@ class SnippetSelecter():
 
   def show(self):
     snippets = []
-    found_snippets = snippet_caller.get_snippets(self.view, None)
+    found_snippets = snippet_caller.get_snippets(self.view, False)
 
     for snippet in found_snippets:
       description = snippet['name']
