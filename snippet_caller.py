@@ -7,10 +7,11 @@ from xml.dom import minidom
 
 try:
   from Context import context
-except ImportError:
+except ImportError as error:
   sublime.error_message("Dependency import failed; please read readme for " +
    "SnippetCaller plugin for installation instructions; to disable this " +
-   "message remove this plugin")
+   "message remove this plugin; message: " + str(error))
+  raise error
 
 class Snippet():
   def __init__(self):

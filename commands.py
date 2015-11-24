@@ -9,11 +9,11 @@ from SnippetCaller import snippet_info
 try:
   from QuickSearchEnhanced import quick_search
   from Context import context
-except ImportError:
+except ImportError as error:
   sublime.error_message("Dependency import failed; please read readme for " +
    "SnippetCaller plugin for installation instructions; to disable this " +
-   "message remove this plugin")
-
+   "message remove this plugin; message: " + str(error))
+  raise error
 
 class InsertSnippetEnhanced(sublime_plugin.TextCommand):
   def run(self, edit, snippet = None, contents = None, **args):
