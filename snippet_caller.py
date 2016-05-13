@@ -94,7 +94,12 @@ class Snippet():
       # load old snippets
       snippet['_scope'] = snippet['scope']
 
-      if re.search(r'^\(?([\w\+]+\.[\w\+]+,?\s*)*', snippet['scope']) != None:
+      is_old = (
+        re.search(r'^\(?([\w\+]+\.[\w\+]+,?\s*)*$', snippet['scope']) != None or
+        '++' in snippet['scope']
+      )
+
+      if is_old:
         snippet['scope'] = (
           '((?:\W|^)' + snippet['scope'].
             replace(', ', '(?:\W|$)|(?:\W|^)').
